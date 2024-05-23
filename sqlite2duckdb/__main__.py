@@ -37,7 +37,8 @@ def sqlite2duckdb(sqlite_db:str, duck_db:str):
     print("Done!")
 
 
-if __name__ == "__main__":
+def main_cli():
+    
     parser = argparse.ArgumentParser(description='Convert Sqlite database to Duckdb database')
 
     parser.add_argument('sqlite_path', type=str, help='sqlite file path')
@@ -53,8 +54,9 @@ if __name__ == "__main__":
             os.remove(args.duckdb_path)
         else:
             exit(1)
-
-        
-
-        
     sqlite2duckdb(args.sqlite_path, args.duckdb_path)
+
+
+if __name__ == "__main__":
+
+    main_cli()
