@@ -10,7 +10,6 @@ A tool for converting a [sqlite](https://www.sqlite.org/) database into a [duckd
 
 Sqlite is an embedded online database designed for transactional reading and writing.
 Duckdb is also an embedded database, but column-oriented, designed for analytical process with a very high reading efficiency.
-In addition, duckdb has a better compression ratio. A test with an 885 MB sqlite database is reduced to 271 MB with duckdb.
 
 For more details [https://towardsdatascience.com/forget-about-sqlite-use-duckdb-instead-and-thank-me-later-df76ee9bb777](https://towardsdatascience.com/forget-about-sqlite-use-duckdb-instead-and-thank-me-later-df76ee9bb777)
 
