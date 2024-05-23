@@ -6,7 +6,10 @@ def sqlite_to_duckdb(sqlite_db:str, duck_db:str):
 
     print(f"Create {duck_db} databases")
 
-    # Remove database if exists
+    if not os.path.exists(sqlite_db):
+        raise Exception(f"File {sqlite_db} doesn't exists")
+
+    # Remove target db if exists
     if os.path.exists(duck_db):
         raise Exception(f"Database {duck_db} already exists")
 
