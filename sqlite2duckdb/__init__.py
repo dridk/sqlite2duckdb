@@ -1,0 +1,2 @@
+
+from sqlite2duckdb.sqlite_to_duckdb import sqlite_to_duckdb

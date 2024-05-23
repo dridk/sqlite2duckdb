@@ -1,0 +1,38 @@
+import duckdb
+import os
+import sqlite3
+
+def sqlite_to_duckdb(sqlite_db:str, duck_db:str):
+
+    print(f"Create {duck_db} databases")
+
+    # Remove database if exists
+    if os.path.exists(duck_db):
+        raise Exception(f"Database {duck_db} already exists")
+
+    # Create databases 
+    conn = duckdb.connect(duck_db)
+    db_name = conn.sql("SELECT database_name FROM duckdb_databases").fetchone()[0]
+
+    ## Install sqlite
+    conn.sql(f"""
+    INSTALL sqlite;
+    LOAD sqlite;
+    ATTACH '{sqlite_db}' as __other;
+    """)
+
+    ## Get sqlite Names 
+    conn.sql("USE __other")
+    tables = [i[0] for i  in conn.sql("SHOW tables").fetchall()]
+    print(f"{len(tables)} tables found(s)")
+    conn.sql(f"USE {db_name}")
+
+    # Create tables     
+    for table in tables:
+        print(f"Create duckdb table {table}")
+        conn.sql(f"CREATE TABLE {table} AS select * FROM __other.{table}")
+
+    conn.sql(f"DETACH __other")
+    conn.close()
+    print("Done!")
+
