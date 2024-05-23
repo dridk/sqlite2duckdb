@@ -1,16 +1,15 @@
 import duckdb 
 import argparse 
 import os
-
-from sqlite2duckdb import sqlite_to_duckdb
+from sqlite2duckdb import sqlite_to_duckdb, __VERSION__
 
 def main_cli():
     
-    parser = argparse.ArgumentParser(description='Convert Sqlite database to Duckdb database')
+    parser = argparse.ArgumentParser(description='Convert Sqlite database to Duckdb database', usage="sqlite2duckdb <sqlite_path> <duckdb_path>")
 
     parser.add_argument('sqlite_path', type=str, help='sqlite file path')
     parser.add_argument('duckdb_path', type=str, help='duckdb file path')
-
+    parser.add_argument("-v", "--version", action="version", version=f"sqlite2duckdb {__VERSION__}")
 
     # Analyser les arguments
     args = parser.parse_args()
