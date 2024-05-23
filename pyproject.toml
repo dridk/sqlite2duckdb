@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sqlite2duckdb"
-version = "0.1.0"
+version = "0.2.0"
 authors = [{name="Sacha Schutz", email="sacha.schutz@pm.me"}]
 description = "A tool to convert sqlite database to duckdb database"
 readme = "README.md"
