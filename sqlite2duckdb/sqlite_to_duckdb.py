@@ -1,6 +1,7 @@
 import duckdb
 import os
 import sqlite3
+import time 
 
 def sqlite_to_duckdb(sqlite_db:str, duck_db:str):
 
@@ -14,6 +15,8 @@ def sqlite_to_duckdb(sqlite_db:str, duck_db:str):
         raise Exception(f"Database {duck_db} already exists")
 
     # Create databases 
+
+    start_time = time.perf_counter()
     conn = duckdb.connect(duck_db)
     db_name = conn.sql("SELECT database_name FROM duckdb_databases").fetchone()[0]
 
@@ -37,5 +40,7 @@ def sqlite_to_duckdb(sqlite_db:str, duck_db:str):
 
     conn.sql(f"DETACH __other")
     conn.close()
-    print("Done!")
+    end_time = time.perf_counter()
+    execution_time = (end_time - start_time) * 1000
+    print(f"Done in {execution_time:.2f} ms !")
 
