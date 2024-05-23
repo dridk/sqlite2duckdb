@@ -1,11 +1,11 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "build", "twine"]
 build-backend = "hatchling.build"
 
 
 [project]
 name = "sqlite2duckdb"
-version = "0.2.1"
+version = "0.3.0"
 authors = [{name="Sacha Schutz", email="sacha.schutz@pm.me"}]
 description = "A tool to convert sqlite database to duckdb database"
 readme = "README.md"
