@@ -58,8 +58,8 @@ sqlite_to_duckdb("source.sqlite", "target.duckdb")
 
 #### Todo 
 
-- [] Custom mapping
-- [] Relation and constraint 
+- [ ] Custom mapping
+- [ ] Relation and constraint 
 
 
 ### See also 
