@@ -16,6 +16,11 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+    'duckdb >= 0.10.0'
+]
+
+
 [project.urls]
 Homepage = "https://github.com/dridk/sqlite2duckdb"
 Issues = "https://github.com/dridk/sqlite2duckdb/issues"
