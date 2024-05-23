@@ -58,7 +58,7 @@ sqlite_to_duckdb("source.sqlite", "target.duckdb")
 
 ### See also 
 
-- [Harlequin](https://github.com/tconbeer/harlequin) A nice duckdb IDE for your terminal
+- [Harlequin](https://github.com/tconbeer/harlequin): A nice duckdb IDE for your terminal
 
 
 
