@@ -1,7 +1,7 @@
 # sqlite2duckdb
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/sqlite2duckdb)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/cutevariant)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/sqlite2duckdb)
 
 A tool for converting a [sqlite](https://www.sqlite.org/) database into a [duckdb](https://duckdb.org/) database
 
