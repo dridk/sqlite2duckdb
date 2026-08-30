@@ -16,6 +16,20 @@ For more details [https://towardsdatascience.com/forget-about-sqlite-use-duckdb-
 
 ## Installation 
 
+With [uv](https://docs.astral.sh/uv/), no installation is required. `uvx` downloads and runs the tool in one go:
+
+```bash
+uvx sqlite2duckdb source.db target.db
+```
+
+To keep it around:
+
+```bash
+uv tool install sqlite2duckdb
+```
+
+Or with pip:
+
 ```
 pip install sqlite2duckdb
 ```
@@ -44,7 +58,7 @@ options:
 ### Examples 
 
 ```bash
-sqlite2duckdb source.db target.db
+uvx sqlite2duckdb source.db target.db
 ```
 
 ### From python 
