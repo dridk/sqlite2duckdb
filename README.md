@@ -82,8 +82,12 @@ print(result.tables, result.views, result.elapsed)
 | FOREIGN KEY and CHECK constraints | ❌ |
 
 A view whose SQL uses something duckdb has no equivalent for (`MATCH`, `julianday()`) is
-skipped with a warning instead of failing the conversion. FOREIGN KEY and CHECK cannot be
-carried over at all: duckdb has no `ALTER TABLE ADD CONSTRAINT`.
+skipped with a warning instead of failing the conversion.
+
+FOREIGN KEY and CHECK are not copied, though not for lack of support: duckdb accepts and
+enforces both in `CREATE TABLE`. It checks foreign keys row by row, so a self-referencing
+table cannot be bulk loaded, and there is no `ALTER TABLE ADD CONSTRAINT` to add them once
+the data is in.
 
 ## Todo
 
