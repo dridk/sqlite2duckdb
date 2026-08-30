@@ -273,7 +273,7 @@ wheels = [
 
 [[package]]
 name = "sqlite2duckdb"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "." }
 dependencies = [
     { name = "duckdb", version = "1.4.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },

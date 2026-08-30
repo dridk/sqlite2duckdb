@@ -95,6 +95,11 @@ def test_bracket_quoted_view(bracket_sqlite, duckdb_path):
         (2, 7),
     ]
 
+    # The bracket quoted view built on it comes across too.
+    assert d_conn.sql(
+        'SELECT * FROM "Order Subtotals" ORDER BY OrderID'
+    ).fetchall() == [(1, 5), (2, 7)]
+
 
 def test_dotted_column_names(dotted_column_sqlite, duckdb_path):
     """Regression test for issue #4: a STRICT table with numeric-looking column

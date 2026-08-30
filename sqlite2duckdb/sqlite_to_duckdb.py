@@ -20,6 +20,7 @@ class ConversionResult:
     tables: int
     elapsed: float
     """Wall clock duration of the conversion, in seconds."""
+    views: int = 0
 
 
 def _quote_identifier(name: str) -> str:
@@ -96,6 +97,88 @@ def _copy_indexes(conn: duckdb.DuckDBPyConnection, sqlite_path: str) -> None:
             logger.warning("Could not recreate index %s: %s", name, error)
 
 
+def _copy_unique_constraints(
+    conn: duckdb.DuckDBPyConnection, sqlite_path: str, table_names: list[str]
+) -> None:
+    """Replay the UNIQUE constraints that sqlite records without any SQL.
+
+    A column or table level UNIQUE becomes an autoindex whose sqlite_master row
+    has a NULL sql, so _copy_indexes cannot see it. Duckdb has no ALTER TABLE ADD
+    CONSTRAINT either, so a unique index is how the guarantee is carried over.
+    """
+
+    with contextlib.closing(sqlite3.connect(sqlite_path)) as source:
+        for table in table_names:
+            indexes = source.execute(
+                f"PRAGMA index_list({_quote_identifier(table)})"
+            ).fetchall()
+
+            for _, index_name, unique, origin, _partial in indexes:
+                # 'c' indexes carry their own SQL and are handled by _copy_indexes,
+                # and 'pk' is already part of the table DDL.
+                if not unique or origin != "u":
+                    continue
+
+                columns = [
+                    row[2]
+                    for row in source.execute(
+                        f"PRAGMA index_info({_quote_identifier(index_name)})"
+                    ).fetchall()
+                ]
+                if any(column is None for column in columns):
+                    logger.warning(
+                        "Skipping unique index %s: it is built on an expression",
+                        index_name,
+                    )
+                    continue
+
+                targets = ", ".join(_quote_identifier(column) for column in columns)
+                try:
+                    conn.sql(
+                        f"CREATE UNIQUE INDEX {_quote_identifier(index_name)} "
+                        f"ON {_quote_identifier(table)} ({targets})"
+                    )
+                except duckdb.Error as error:
+                    logger.warning(
+                        "Could not recreate unique index %s: %s", index_name, error
+                    )
+
+
+def _copy_views(conn: duckdb.DuckDBPyConnection, sqlite_path: str) -> int:
+    """Recreate the source views, and return how many made it across."""
+
+    with contextlib.closing(sqlite3.connect(sqlite_path)) as source:
+        views = source.execute(
+            "SELECT name, sql FROM sqlite_master WHERE type = 'view' AND sql IS NOT NULL"
+        ).fetchall()
+
+    pending = [(name, _brackets_to_quotes(sql)) for name, sql in views]
+    errors: dict[str, duckdb.Error] = {}
+    created = 0
+
+    # A view can sit on top of another one and sqlite_master does not guarantee
+    # dependency order, so keep retrying while a pass still makes progress.
+    while pending:
+        failed = []
+        for name, statement in pending:
+            try:
+                conn.sql(statement)
+            except duckdb.Error as error:
+                errors[name] = error
+                failed.append((name, statement))
+            else:
+                created += 1
+
+        if len(failed) == len(pending):
+            break
+        pending = failed
+
+    for name, _ in pending:
+        logger.warning("Could not recreate view %s: %s", name, errors[name])
+
+    return created
+
+
 def _copy_tables(
     conn: duckdb.DuckDBPyConnection, tables: list[tuple[str, str]]
 ) -> None:
@@ -118,9 +201,12 @@ def sqlite_to_duckdb(
 ) -> ConversionResult:
     """Copy a sqlite database into a new duckdb database.
 
-    Tables, data, primary keys, NOT NULL constraints and indexes are copied.
-    Views and UNIQUE / FOREIGN KEY / CHECK constraints are not: duckdb's sqlite
-    extension does not expose them on the attached database.
+    Tables, data, views, primary keys, NOT NULL and UNIQUE constraints and
+    indexes are copied. FOREIGN KEY and CHECK constraints are not: duckdb has no
+    ALTER TABLE ADD CONSTRAINT, so they cannot be replayed after the fact.
+
+    A view duckdb cannot bind is skipped with a warning rather than failing the
+    whole conversion.
 
     Raises FileNotFoundError if `sqlite_db` does not exist, and FileExistsError
     if `duck_db` already exists and `overwrite` is False.
@@ -157,6 +243,10 @@ def sqlite_to_duckdb(
 
         _copy_tables(conn, tables)
         _copy_indexes(conn, sqlite_path)
+        _copy_unique_constraints(conn, sqlite_path, [name for name, _ in tables])
+        views = _copy_views(conn, sqlite_path)
+        if views:
+            logger.info("%d view(s) copied", views)
 
         conn.sql("DETACH __other")
     except BaseException:
@@ -171,4 +261,6 @@ def sqlite_to_duckdb(
     elapsed = time.perf_counter() - start_time
     logger.info("Done in %s !", _format_duration(elapsed))
 
-    return ConversionResult(target=duck_path, tables=len(tables), elapsed=elapsed)
+    return ConversionResult(
+        target=duck_path, tables=len(tables), elapsed=elapsed, views=views
+    )
