@@ -11,7 +11,7 @@ A tool for converting a [sqlite](https://www.sqlite.org/) database into a [duckd
 Sqlite is an embedded online database designed for transactional reading and writing.
 Duckdb is also an embedded database, but column-oriented, designed for analytical process with a very high reading efficiency.
 
-For more details [https://towardsdatascience.com/forget-about-sqlite-use-duckdb-instead-and-thank-me-later-df76ee9bb777](Medium post)
+For more details [Medium post](https://towardsdatascience.com/forget-about-sqlite-use-duckdb-instead-and-thank-me-later-df76ee9bb777)
 
 Requires Python >= 3.9 and duckdb >= 1.1.0 (indexes are only copied from that version on).
 
