@@ -202,8 +202,9 @@ def sqlite_to_duckdb(
     """Copy a sqlite database into a new duckdb database.
 
     Tables, data, views, primary keys, NOT NULL and UNIQUE constraints and
-    indexes are copied. FOREIGN KEY and CHECK constraints are not: duckdb has no
-    ALTER TABLE ADD CONSTRAINT, so they cannot be replayed after the fact.
+    indexes are copied. FOREIGN KEY and CHECK constraints are not: duckdb checks
+    foreign keys row by row, so a self-referencing table cannot be bulk loaded,
+    and there is no ALTER TABLE ADD CONSTRAINT to add them once the data is in.
 
     A view duckdb cannot bind is skipped with a warning rather than failing the
     whole conversion.
