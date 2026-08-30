@@ -1,0 +1,52 @@
+name: Bug report
+description: A conversion that fails, or a duckdb database that does not match its source
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The schema that reproduces the problem is the most useful thing you can attach.
+        `sqlite3 source.db .schema` is usually enough, and it leaks none of your data.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you ran, and what came out of it.
+      placeholder: |
+        $ sqlite2duckdb source.db target.db
+        ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: schema
+    attributes:
+      label: Source schema
+      description: The output of `sqlite3 source.db .schema`, or the part of it that matters.
+      render: sql
+
+  - type: input
+    id: version
+    attributes:
+      label: sqlite2duckdb version
+      description: The output of `sqlite2duckdb --version`.
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Python, duckdb and OS
+      description: |
+        `python --version`, `python -c "import duckdb; print(duckdb.__version__)"`, and your OS.
+      placeholder: "Python 3.12.3, duckdb 1.1.3, Ubuntu 24.04"
+    validations:
+      required: true

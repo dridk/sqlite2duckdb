@@ -1,0 +1,30 @@
+name: Feature request
+description: Something the conversion should handle and does not
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The README lists what is converted and what is deliberately left out — worth a
+        look first, since FOREIGN KEY and CHECK are skipped on purpose.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do
+      description: The case you are stuck on, rather than the solution you have in mind.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would like it to do
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you do today instead
+      description: Any workaround you are using, including other tools.

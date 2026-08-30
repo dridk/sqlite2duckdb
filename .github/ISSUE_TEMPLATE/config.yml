@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Question about duckdb itself
+    url: https://duckdb.org/docs/
+    about: Anything about duckdb's SQL or storage rather than the conversion.
