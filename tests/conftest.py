@@ -49,3 +49,13 @@ def duckdb_path(tmp_path):
 @pytest.fixture(scope="module")
 def bracket_index_sqlite(tmp_path_factory):
     return _module_db(tmp_path_factory, "bindex", utils.build_bracket_index_sqlite)
+
+
+@pytest.fixture(scope="module")
+def views_sqlite(tmp_path_factory):
+    return _module_db(tmp_path_factory, "views", utils.build_views_sqlite)
+
+
+@pytest.fixture(scope="module")
+def unique_sqlite(tmp_path_factory):
+    return _module_db(tmp_path_factory, "unique", utils.build_unique_sqlite)

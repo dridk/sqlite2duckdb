@@ -200,3 +200,53 @@ def build_bracket_index_sqlite(path):
     conn.close()
 
     return path
+
+
+def build_views_sqlite(path):
+    """Views, including one chained on another and one duckdb cannot bind."""
+
+    conn = sqlite3.connect(path)
+    conn.executescript(
+        """
+        CREATE TABLE sales (id INTEGER, region TEXT, amount INTEGER);
+        INSERT INTO sales VALUES (1, 'north', 10), (2, 'north', 5), (3, 'south', 7);
+
+        CREATE VIEW by_region AS
+            SELECT region, SUM(amount) AS total FROM sales GROUP BY region;
+
+        CREATE VIEW big_regions AS
+            SELECT region FROM by_region WHERE total > 8;
+
+        CREATE VIEW [north sales] AS SELECT * FROM sales WHERE [region] = 'north';
+
+        -- MATCH is sqlite only, and duckdb's parser rejects it outright.
+        CREATE VIEW matched AS SELECT * FROM sales WHERE region MATCH 'north';
+        """
+    )
+    conn.commit()
+    conn.close()
+
+    return path
+
+
+def build_unique_sqlite(path):
+    """The three ways sqlite records uniqueness."""
+
+    conn = sqlite3.connect(path)
+    conn.executescript(
+        """
+        CREATE TABLE members (
+            id INTEGER PRIMARY KEY,
+            email TEXT UNIQUE,
+            first TEXT,
+            last TEXT,
+            UNIQUE (first, last)
+        );
+        INSERT INTO members VALUES (1, 'ada@example.com', 'ada', 'lovelace');
+        CREATE UNIQUE INDEX idx_members_last ON members (last);
+        """
+    )
+    conn.commit()
+    conn.close()
+
+    return path

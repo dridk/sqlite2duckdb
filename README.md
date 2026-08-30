@@ -73,11 +73,11 @@ uvx sqlite2duckdb --force source.db target.db   # overwrite target.db without as
 from sqlite2duckdb import sqlite_to_duckdb
 
 result = sqlite_to_duckdb("source.sqlite", "target.duckdb")
-print(result.tables, result.elapsed)
+print(result.tables, result.views, result.elapsed)
 ```
 
 `sqlite_to_duckdb(sqlite_db, duck_db, *, overwrite=False)` accepts `str` or `pathlib.Path`
-and returns a `ConversionResult` (`target`, `tables`, `elapsed`). It raises
+and returns a `ConversionResult` (`target`, `tables`, `views`, `elapsed`). It raises
 `FileNotFoundError` if the source is missing and `FileExistsError` if the target already
 exists and `overwrite` is False. If the conversion fails halfway, the partially written
 target file is removed rather than left behind. Progress is reported through the standard
@@ -88,23 +88,36 @@ target file is removed rather than left behind. Progress is reported through the
 | | |
 |---|---|
 | Tables and data | ✅ |
-| Primary keys, NOT NULL constraints, indexes | ✅ |
-| UNIQUE, FOREIGN KEY and CHECK constraints | ❌ |
-| Views | ❌ (silently dropped) |
-
-Duckdb's sqlite extension does not expose the last two on the attached database, so they
-cannot be copied. Reading them back from `sqlite_master` would be needed.
+| Primary keys, NOT NULL and UNIQUE constraints | ✅ |
+| Indexes | ✅ |
+| Views | ✅ best effort |
+| FOREIGN KEY and CHECK constraints | ❌ |
 
 Tables are recreated from the DDL duckdb derives for the attached database, then filled
-from it, and the indexes are read back from `sqlite_master`. This is what makes sqlite
-files that quote their DDL with `[brackets]` (chinook.db, MS Access exports) convert
-correctly: duckdb's own parser rejects that syntax, so the quoting is translated first.
+from it. Everything duckdb's sqlite extension does not expose on an attached database is
+read back from `sqlite_master` instead: the indexes and the views with their SQL, and the
+UNIQUE constraints through `PRAGMA index_list`, since sqlite records those as autoindexes
+carrying no SQL at all.
+
+That detour is also what makes sqlite files quoting their DDL with `[brackets]`
+(chinook.db, MS Access exports) convert correctly: duckdb's parser rejects that syntax, so
+the quoting is translated first.
+
+Views are best effort because their SQL is sqlite's, not duckdb's. One using a construct
+duckdb has no equivalent for (`MATCH`, or a function like `julianday`) is skipped with a
+warning rather than failing the whole conversion; everything else still converts. Views
+sitting on top of other views are handled whatever order `sqlite_master` lists them in.
+
+FOREIGN KEY and CHECK constraints are the one real gap: duckdb has no
+`ALTER TABLE ADD CONSTRAINT`, so there is no way to add them once the table exists.
+Carrying them over would mean generating the whole `CREATE TABLE` by hand, with a type
+mapping of our own, instead of reusing the one duckdb already derives.
 
 ## Todo
 
 - [ ] Custom type mapping
-- [x] Primary keys, NOT NULL constraints and indexes
-- [ ] Views, and UNIQUE / FOREIGN KEY / CHECK constraints
+- [ ] FOREIGN KEY and CHECK constraints
+- [x] Primary keys, NOT NULL and UNIQUE constraints, indexes and views
 
 ## Contributing
 
