@@ -10,8 +10,35 @@ jobs:
     permissions:
       # Required for PyPI trusted publishing: no API token to store as a secret.
       id-token: write
+      # Required to create the GitHub release below.
+      contents: write
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v10.0.1
       - run: uv build
       - run: uv publish --trusted-publishing always
+
+      # A tag on its own is invisible: the release entry is what shows up in the repo
+      # sidebar and in the feeds that watch for new versions. Cut it from the changelog
+      # so the notes are the ones that were written by hand, not a list of commits.
+      - name: Collect the release notes from CHANGELOG.md
+        run: |
+          awk -v version="${GITHUB_REF_NAME#v}" '
+            $0 ~ "^## \\[" version "\\]" { found = 1; next }
+            found && /^## \[/ { exit }
+            found && /^\[[^]]+\]: / { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if grep -q '[^[:space:]]' release-notes.md; then
+            gh release create "$GITHUB_REF_NAME" dist/* \
+              --title "$GITHUB_REF_NAME" --notes-file release-notes.md
+          else
+            echo "no CHANGELOG.md section for $GITHUB_REF_NAME, falling back to commits"
+            gh release create "$GITHUB_REF_NAME" dist/* \
+              --title "$GITHUB_REF_NAME" --generate-notes
+          fi
