@@ -1,10 +1,17 @@
 # sqlite2duckdb
 
-![CI](https://github.com/dridk/sqlite2duckdb/actions/workflows/ci.yml/badge.svg)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/sqlite2duckdb)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/sqlite2duckdb)
+[![CI](https://github.com/dridk/sqlite2duckdb/actions/workflows/ci.yml/badge.svg)](https://github.com/dridk/sqlite2duckdb/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/sqlite2duckdb)](https://pypi.org/project/sqlite2duckdb/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/sqlite2duckdb)](https://pypi.org/project/sqlite2duckdb/)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/sqlite2duckdb)](https://pypi.org/project/sqlite2duckdb/)
+[![License](https://img.shields.io/pypi/l/sqlite2duckdb)](LICENSE)
 
-A tool for converting a [sqlite](https://www.sqlite.org/) database into a [duckdb](https://duckdb.org/) database
+Convert a [sqlite](https://www.sqlite.org/) database into a [duckdb](https://duckdb.org/)
+database — tables, indexes and views — in one command.
+
+```bash
+uvx sqlite2duckdb source.db target.db
+```
 
 ## Description
 
@@ -101,6 +108,10 @@ make lint    # uv run ruff check . && uv run ruff format --check .
 make build   # uv build
 make publish # uv publish (PyPI trusted publishing, also run on tags by CI)
 ```
+
+[CONTRIBUTING.md](CONTRIBUTING.md) has the rest: what a pull request needs, where the
+test fixtures live, and how a release is cut. [CHANGELOG.md](CHANGELOG.md) tracks what
+changed between versions.
 
 ### See also
 
