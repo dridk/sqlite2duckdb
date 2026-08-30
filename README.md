@@ -89,11 +89,6 @@ enforces both in `CREATE TABLE`. It checks foreign keys row by row, so a self-re
 table cannot be bulk loaded, and there is no `ALTER TABLE ADD CONSTRAINT` to add them once
 the data is in.
 
-## Todo
-
-- [ ] Custom type mapping
-- [ ] FOREIGN KEY and CHECK constraints
-- [x] Primary keys, NOT NULL and UNIQUE constraints, indexes and views
 
 ## Contributing
 
