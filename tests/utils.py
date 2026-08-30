@@ -66,3 +66,52 @@ def generate_fake_sqlite():
 	conn.close()
 
 	return temp_file_path
+
+
+def generate_edge_case_sqlite():
+
+	temp_file_path = tempfile.mkstemp(prefix="sqlite2duckdb_edge", suffix=".sqlite")[1]
+	print(f"Create temp sqlite db at {temp_file_path}")
+
+	conn = sqlite3.connect(temp_file_path)
+	conn.executescript('''
+		CREATE TABLE users (
+			id INTEGER PRIMARY KEY,
+			name TEXT NOT NULL,
+			age INTEGER
+		);
+		INSERT INTO users (name, age) VALUES ('alice', 30), ('bob', 40);
+		CREATE INDEX idx_users_age ON users(age);
+
+		CREATE TABLE "my table" (a INTEGER, b TEXT);
+		INSERT INTO "my table" VALUES (1, 'x');
+
+		CREATE TABLE "order" (x INTEGER);
+		INSERT INTO "order" VALUES (7);
+	''')
+	conn.commit()
+	conn.close()
+
+	return temp_file_path
+
+
+def generate_bracket_sqlite():
+	"""Sqlite db using [bracket] quoting, as produced by MS Access exports (issue #3)."""
+
+	temp_file_path = tempfile.mkstemp(prefix="sqlite2duckdb_bracket", suffix=".sqlite")[1]
+	print(f"Create temp sqlite db at {temp_file_path}")
+
+	conn = sqlite3.connect(temp_file_path)
+	conn.executescript('''
+		CREATE TABLE [Order Details] ([OrderID] INTEGER, [Qty] INTEGER);
+		INSERT INTO [Order Details] VALUES (1, 5), (2, 7);
+
+		CREATE VIEW [Order Subtotals] AS
+			SELECT [Order Details].OrderID, Sum([Order Details].Qty) AS Total
+			FROM [Order Details]
+			GROUP BY [Order Details].OrderID;
+	''')
+	conn.commit()
+	conn.close()
+
+	return temp_file_path

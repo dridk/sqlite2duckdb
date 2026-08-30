@@ -21,26 +21,22 @@ def sqlite_to_duckdb(sqlite_db: str, duck_db: str):
     db_name = conn.sql("SELECT database_name FROM duckdb_databases").fetchone()[0]
 
     ## Install sqlite
-    conn.sql(
-        f"""
-    INSTALL sqlite;
-    LOAD sqlite;
-    ATTACH '{sqlite_db}' as __other;
-    """
-    )
+    conn.sql("INSTALL sqlite; LOAD sqlite;")
+
+    # Bound parameters are not allowed in ATTACH, so escape the quotes ourselves
+    source_path = sqlite_db.replace("'", "''")
+    conn.sql(f"ATTACH '{source_path}' AS __other (TYPE SQLITE, READ_ONLY)")
 
     ## Get sqlite Names
-    conn.sql("USE __other")
-    tables = [i[0] for i in conn.sql("SHOW tables").fetchall()]
+    tables = conn.sql(
+        "SELECT table_name FROM duckdb_tables WHERE database_name = '__other'"
+    ).fetchall()
     print(f"{len(tables)} tables found(s)")
-    conn.sql(f"USE {db_name}")
 
-    # Create tables
-    for table in tables:
-        print(f"Create duckdb table {table}")
-        conn.sql(f"CREATE TABLE {table} AS select * FROM __other.{table}")
+    # Copy tables, data, constraints and indexes at once
+    conn.sql(f'COPY FROM DATABASE __other TO "{db_name}"')
 
-    conn.sql(f"DETACH __other")
+    conn.sql("DETACH __other")
     conn.close()
     end_time = time.perf_counter()
     execution_time = (end_time - start_time) * 1000
