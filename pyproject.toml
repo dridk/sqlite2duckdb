@@ -7,13 +7,31 @@ build-backend = "hatchling.build"
 name = "sqlite2duckdb"
 version = "0.5.0"
 authors = [{name="Sacha Schutz", email="sacha.schutz@pm.me"}]
-description = "A tool to convert sqlite database to duckdb database"
+description = "Convert a SQLite database into a DuckDB database — tables, indexes and views, in one command"
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
 license-files = ["LICENSE"]
-keywords = ["sqlite", "duckdb", "database", "olap", "oltp"]
+keywords = [
+    "sqlite",
+    "sqlite3",
+    "duckdb",
+    "database",
+    "olap",
+    "oltp",
+    "migration",
+    "converter",
+    "etl",
+    "analytics",
+    "cli",
+]
 classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Database",
+    "Topic :: Database :: Database Engines/Servers",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -21,6 +39,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Operating System :: OS Independent",
+    "Typing :: Typed",
 ]
 dependencies = [
     'duckdb >= 1.1.0'
@@ -29,6 +48,9 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/dridk/sqlite2duckdb"
+Repository = "https://github.com/dridk/sqlite2duckdb"
+Documentation = "https://github.com/dridk/sqlite2duckdb#readme"
+Changelog = "https://github.com/dridk/sqlite2duckdb/releases"
 Issues = "https://github.com/dridk/sqlite2duckdb/issues"
 
 [project.scripts]
