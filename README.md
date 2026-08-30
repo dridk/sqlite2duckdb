@@ -73,7 +73,10 @@ sqlite_to_duckdb("source.sqlite", "target.duckdb")
 ## Todo 
 
 - [ ] Custom mapping
-- [x] Relation and constraint
+- [x] Primary keys, NOT NULL constraints and indexes
+- [ ] UNIQUE, FOREIGN KEY and CHECK constraints, and views: duckdb's sqlite
+      extension does not expose them on the attached database, so they cannot be
+      copied. Reading them back from `sqlite_master` would be needed.
 
 
 ### See also 
