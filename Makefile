@@ -1,12 +1,16 @@
 
-run:
-	python -m sqlite2duckdb 
-	
-build:
-	rm -Rf dist/ ; python -m build
+dev:
+	uv sync
+
+lint:
+	uv run ruff check .
+	uv run ruff format --check .
 
 test:
-	python -m pytest
+	uv run pytest
+
+build:
+	rm -rf dist/ && uv build
 
 publish:
-	python -m twine upload  dist/*
+	uv publish
