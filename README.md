@@ -11,7 +11,7 @@ A tool for converting a [sqlite](https://www.sqlite.org/) database into a [duckd
 Sqlite is an embedded online database designed for transactional reading and writing.
 Duckdb is also an embedded database, but column-oriented, designed for analytical process with a very high reading efficiency.
 
-For more details [https://towardsdatascience.com/forget-about-sqlite-use-duckdb-instead-and-thank-me-later-df76ee9bb777](https://towardsdatascience.com/forget-about-sqlite-use-duckdb-instead-and-thank-me-later-df76ee9bb777)
+For more details [https://towardsdatascience.com/forget-about-sqlite-use-duckdb-instead-and-thank-me-later-df76ee9bb777](Medium post)
 
 Requires Python >= 3.9 and duckdb >= 1.1.0 (indexes are only copied from that version on).
 
@@ -56,10 +56,6 @@ options:
   -v, --version  show program's version number and exit
 ```
 
-The tool never overwrites an existing target silently. On a terminal it asks for
-confirmation; anywhere else (a script, a CI job, a pipe) it exits with code 1 and tells you
-to pass `--force`. Progress is written to stderr, so stdout stays free for pipelines.
-
 ### Examples
 
 ```bash
@@ -76,13 +72,6 @@ result = sqlite_to_duckdb("source.sqlite", "target.duckdb")
 print(result.tables, result.elapsed)
 ```
 
-`sqlite_to_duckdb(sqlite_db, duck_db, *, overwrite=False)` accepts `str` or `pathlib.Path`
-and returns a `ConversionResult` (`target`, `tables`, `elapsed`). It raises
-`FileNotFoundError` if the source is missing and `FileExistsError` if the target already
-exists and `overwrite` is False. If the conversion fails halfway, the partially written
-target file is removed rather than left behind. Progress is reported through the standard
-`logging` module (logger `sqlite2duckdb.sqlite_to_duckdb`), never printed.
-
 ## What is converted
 
 | | |
@@ -91,14 +80,6 @@ target file is removed rather than left behind. Progress is reported through the
 | Primary keys, NOT NULL constraints, indexes | ✅ |
 | UNIQUE, FOREIGN KEY and CHECK constraints | ❌ |
 | Views | ❌ (silently dropped) |
-
-Duckdb's sqlite extension does not expose the last two on the attached database, so they
-cannot be copied. Reading them back from `sqlite_master` would be needed.
-
-Tables are recreated from the DDL duckdb derives for the attached database, then filled
-from it, and the indexes are read back from `sqlite_master`. This is what makes sqlite
-files that quote their DDL with `[brackets]` (chinook.db, MS Access exports) convert
-correctly: duckdb's own parser rejects that syntax, so the quoting is translated first.
 
 ## Todo
 
